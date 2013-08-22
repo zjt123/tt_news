@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffffff" >
+    <include
+        android:id="@+id/web_view_title"
+        android:layout_alignParentTop="true"
+        layout="@layout/base_view_title" />
+    <FrameLayout
+        android:id="@+id/web_frame_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/webview_navigate"
+        android:layout_below="@id/web_view_title" >
+        <WebView
+            android:id="@+id/webview_browser"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scrollbars="none"
+            android:visibility="visible" />
+        <ProgressBar
+            android:id="@+id/webview_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="3dip"
+            android:background="@null"
+            android:progressDrawable="@drawable/progress_bar_layer" />
+    </FrameLayout>
+    <LinearLayout
+        android:id="@+id/webview_navigate"
+        android:layout_width="fill_parent"
+        android:layout_height="52dip"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/webview_bottom_main_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="5dip"
+        android:paddingRight="5dip" >
+        <ImageView
+            android:id="@+id/imgview_browser_home"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/button_brower_home" />
+        <ImageView
+            android:id="@+id/imgview_browser_back"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/button_brower_back" />
+        <ImageView
+            android:id="@+id/imgview_browser_forward"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/button_brower_forward" />
+        <ImageView
+            android:id="@+id/imgview_browser_refresh"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/button_brower_refresh" />
+    </LinearLayout>
+</RelativeLayout>

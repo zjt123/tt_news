@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tiantian.news"
+    android:versionName="1.1"
+    android:installLocation="auto"
+    android:versionCode="20130814" >
+    
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="17" />
+    <application
+        android:name="com.tiantian.news.App"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:name="com.tiantian.news.NewsMainTabActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/StyledIndicators"><!-- 
+            android:theme="@style/Theme.PageIndicatorDefaults" -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.tiantian.news.BrowserActivity"
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:process=":newsBrowserActivity"
+            android:configChanges="keyboardHidden|orientation" />
+        
+        
+        <activity
+            android:name="com.tiantian.news.test.TestScroll"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+<!--             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter> -->
+        </activity>
+        
+    </application>
+</manifest>

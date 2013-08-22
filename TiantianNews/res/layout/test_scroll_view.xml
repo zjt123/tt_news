@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title_main_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#823567"
+    android:gravity="center" >
+    <Button
+        android:id="@+id/textview_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="测试scrool"
+        android:textColor="#ffe5e5e5"
+        android:textSize="18sp" />
+</RelativeLayout>

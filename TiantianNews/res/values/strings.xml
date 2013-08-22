@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+    <string name="app_name">天天新闻</string>
+        
+    <string name="listview_header_hint_normal">下拉刷新</string>
+    <string name="listview_header_hint_ready">松开刷新数据</string>
+    <string name="listview_header_hint_loading">正在刷新...</string>
+    <string name="listview_header_last_time">初始化更新</string>
+    <string name="listview_header_last_time_for_min">%1$s分钟前更新</string>
+    <string name="listview_header_last_time_for_hour">%1$s小时前更新</string>
+    <string name="listview_header_last_time_for_day">%1$s天前更新</string>
+    <string name="listview_header_last_time_for_date">%1$s更新</string>
+    <string name="load_more_text">载入中...</string>
+    <string name="listview_header_load_fail">更新失败!</string>
+    <string name="exit_news_str">再按一次退出天天新闻</string>
+
+	<integer-array name="channel_ids">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </integer-array>
+
+	<string-array name="channel_names">
+        <item>焦点报道</item>
+        <item>国际/港台</item>
+        <item>内地</item>
+        <item>财经</item>
+        <item>科技</item>
+        <item>体育</item>
+        <item>娱乐</item>
+        <item>健康</item>
+        <item>热门报道</item>
+    </string-array>
+
+	<!-- ned=cn or us -->
+	<string-array name="channel_urls">
+        <item>http://news.google.com/news?output=rss&amp;topic=h&amp;ned=</item>
+        <item>http://news.google.com/news?output=rss&amp;topic=w&amp;ned=</item>
+        <item>http://news.google.com/news?output=rss&amp;topic=n&amp;ned=</item>
+        <item>http://news.google.com/news?output=rss&amp;topic=b&amp;ned=</item>
+        <item>http://news.google.com/news?output=rss&amp;topic=t&amp;ned=</item>
+        <item>http://news.google.com/news?output=rss&amp;topic=s&amp;ned=</item>
+        <item>http://news.google.com/news?output=rss&amp;topic=e&amp;ned=</item>
+        <item>http://news.google.com/news?output=rss&amp;topic=m&amp;ned=</item>
+        <item>http://news.google.com/news?output=rss&amp;topic=po&amp;ned=</item>
+    </string-array>
+
+    <item name="new_item_link_tag" type="id"/>
+    <item name="new_image_link_tag" type="id"/>
+    <item name="new_item_obj" type="id"/>
+    <item name="new_item_title_view" type="id"/>
+</resources>
