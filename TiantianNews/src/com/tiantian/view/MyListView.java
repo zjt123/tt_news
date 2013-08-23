@@ -44,9 +44,6 @@ public class MyListView extends ListView implements OnScrollListener {
 	// total list items, used to detect is at the bottom of listview.
 	private int mTotalItemCount;
 
-//	private int mScrollBack;
-//	private final static int SCROLLBACK_HEADER = 0;
-//	private final static int SCROLLBACK_FOOTER = 1;
 	private boolean mScrollBackHeader;
 	private boolean mScrollBackFooter;
 
@@ -149,7 +146,6 @@ public class MyListView extends ListView implements OnScrollListener {
 			mLastY = ev.getRawY();
 		}
 
-//		Log.v("zhang", "onTouchEvent ============= ev.getAction() = "+ev.getAction());
 		switch (ev.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			mLastY = ev.getRawY();
@@ -157,8 +153,6 @@ public class MyListView extends ListView implements OnScrollListener {
 		case MotionEvent.ACTION_MOVE:
 			final float deltaY = ev.getRawY() - mLastY;
 			mLastY = ev.getRawY();
-//			Log.v("zhang", "数据监测：" + getFirstVisiblePosition() + "<---->" + getLastVisiblePosition() +" -- mTotalItemCount = "+mTotalItemCount);
-//			Log.v("zhang", "数据监测：mFooterView_Height = " + mFooterView.getVisiableHeight() + "<----> deltaY = " + deltaY+" -- mLoadMoreRefreshing == "+mLoadMoreRefreshing);
 			if (!mPullRefreshing && getFirstVisiblePosition() == 0
 					&& (mHeaderView.getVisiableHeight() > 0 || deltaY > 0)) {
 				if (mListViewListener != null && mBeforeChangeViewHeight) {
@@ -170,33 +164,17 @@ public class MyListView extends ListView implements OnScrollListener {
 				invokeOnScrolling();
 			} else if (getLastVisiblePosition() == mTotalItemCount - 1
 					&& (mFooterView.getVisiableHeight() > 0 || deltaY < 0)) {
-//				if (mCanLoadMore) {//TODO
-//					if(mListViewListener != null && !mLoadMoreRefreshing) {
-//						mLoadMoreRefreshing = true;
-//						mFooterView.show(mLoadMoreView);
-////						setSelection(mTotalItemCount);
-////						mListViewListener.onLoadMore();
-//						postDelayed(mRunnable, 1000);
-//					}
-//				} else {
-//					// last item, already pulled up or want to pull up.
-//					updateEmptyHeight(-deltaY / OFFSET_RADIO);
-//				}
 				if (!mLoadMoreRefreshing) {
 					mScroller.abortAnimation();
 					updateEmptyHeight(-deltaY / OFFSET_RADIO);
 				}
 			} else if(getLastVisiblePosition()  >= mTotalItemCount - getFooterViewsCount() && mFooterView.getVisiableHeight() > 0) {
-//				mFooterView.setVisiableHeight(0);
-//				Log.v("zhang", "onTouchEvent getLastVisiblePosition === ");
 				if (!mLoadMoreRefreshing) {
 					resetFooterHeight();
 				}
 			}
 			break;
 		default:
-//			Log.v("zhang", "default：mFooterView_Height = " + mFooterView.getVisiableHeight() + "<----> mTotalItemCount = " + mTotalItemCount+" -- mLoadMoreRefreshing == "+mLoadMoreRefreshing);
-//			Log.v("zhang", "default：getLastVisiblePosition() = " + getLastVisiblePosition() + "<----> mFooterView.getHeight() = " + mFooterView.getHeight());
 			mLastY = -1; // reset
 			if (getFirstVisiblePosition() == 0) {
 				// invoke refresh
@@ -227,27 +205,13 @@ public class MyListView extends ListView implements OnScrollListener {
 	@Override
 	public void computeScroll() {
 		boolean mScrollOffset = mScroller.computeScrollOffset();
-//		Log.v("zhang", "computeScroll --- mScrollOffset == "+mScrollOffset+" -- Header = "+mScrollBackHeader+" -- Footer = "+mScrollBackFooter);
 		if (mScrollOffset) {
-//			Log.v("zhang", "computeScroll true ==== mFooterView.getVisiableHeight() = "+mFooterView.getVisiableHeight());
 			if(mScrollBackHeader) {
-//				Log.v("zhang", "computeScroll --- mHeaderView.getVisiableHeight() = "+mHeaderView.getVisiableHeight());
 				mHeaderView.setVisiableHeight(mScroller.getCurrY());
 			}
 			if(mScrollBackFooter && !mLoadMoreRefreshing) {
-//				Log.v("zhang", "computeScroll --- mFooterView.H = "+mFooterView.getVisiableHeight());
 				mFooterView.setVisiableHeight(mScroller.getCurrY());
 			}
-//			switch (mScrollBack) {
-//			case SCROLLBACK_HEADER:
-//				mHeaderView.setVisiableHeight(mScroller.getCurrY());
-//				break;
-//			case SCROLLBACK_FOOTER:
-//				mFooterView.setVisiableHeight(mScroller.getCurrY());
-//				break;
-//			default:
-//				break;
-//			}
 			postInvalidate();
 			invokeOnScrolling();
 		} else {
@@ -297,7 +261,6 @@ public class MyListView extends ListView implements OnScrollListener {
 				finalHeight = mHeaderViewHeight;
 			}
 		}
-//		mScrollBack = SCROLLBACK_HEADER;
 		mScrollBackHeader = true;
 		mScroller.startScroll(0, height, 0, finalHeight - height,
 				SCROLL_DURATION);
@@ -308,8 +271,6 @@ public class MyListView extends ListView implements OnScrollListener {
 	private void resetFooterHeight() {
 		int height = mFooterView.getVisiableHeight();
 		if (height > 0) {
-//			mScroller.abortAnimation();
-//			mScrollBack = SCROLLBACK_FOOTER;
 			mScrollBackFooter = true;
 			mScroller.startScroll(0, height, 0, -height,
 					SCROLL_DURATION);
@@ -356,7 +317,6 @@ public class MyListView extends ListView implements OnScrollListener {
 	public void stopRefresh() {
 		resetFooterHeight();
 		if (mPullRefreshing) {
-//			mPullRefreshing = false;
 			resetHeaderHeight(false);
 			mPullRefreshing = false;
 		}
@@ -373,7 +333,6 @@ public class MyListView extends ListView implements OnScrollListener {
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-//		Log.v("zhang", "onScrollStateChanged === scrollState = "+scrollState+" -- getLastVisiblePosition() = "+getLastVisiblePosition()+" - mCanLoadMore = "+mCanLoadMore+" - mTotalItemCount = "+mTotalItemCount);
 		switch (scrollState) {
 		case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
 			mBeforeChangeViewHeight = mHeaderView.getVisiableHeight() == 0;
@@ -386,12 +345,9 @@ public class MyListView extends ListView implements OnScrollListener {
 					mLoadMoreRefreshing = true;
 					mFooterView.show(mLoadMoreView);// TODO
 					setSelection(mTotalItemCount + 1);
-					// mListViewListener.onLoadMore();
 					postDelayed(mRunnable, 800);
 				}
-			} /*else if (!mCanLoadMore && isLast) {
-				resetFooterHeight();
-			}*/
+			}
 			break;
 		default:
 			break;
@@ -404,10 +360,6 @@ public class MyListView extends ListView implements OnScrollListener {
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
-//		if (firstVisibleItem + visibleItemCount == totalItemCount) {
-//
-//		}
-//		Log.v("zhang", "onScroll == totalItemCount = "+totalItemCount+" -- firstVisibleItem = "+firstVisibleItem+"-- visibleItemCount = "+visibleItemCount);
 		mTotalItemCount = totalItemCount;
 		if (mScrollListener != null) {
 			mScrollListener.onScroll(view, firstVisibleItem, visibleItemCount,
@@ -429,10 +381,6 @@ public class MyListView extends ListView implements OnScrollListener {
 	public void stopLoadMore() {
 		resetFooterHeight();
 		if(mLoadMoreRefreshing) {
-//			if (mCanLoadMore) {
-//				mLoadMoreRefreshing = false;
-//				mFooterView.hide();
-//			}
 			mLoadMoreRefreshing = false;
 			mFooterView.hide();
 		}

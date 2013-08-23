@@ -2,6 +2,7 @@ package com.tiantian.news;
 
 import com.tiantian.news.adapter.NewsPageAdapter;
 import com.tiantian.news.bean.NewsItem;
+import com.tiantian.news.db.NewsDatabase;
 import com.tiantian.news.util.ImageLoader;
 import com.tiantian.view.TabPageIndicator;
 import com.tiantian.news.R;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 public class NewsMainTabActivity extends FragmentActivity {
 	
 	private static final long DIFF_DEFAULT_BACK_TIME = 2000;
+	private static final String fTag = "NewsMainTabActivity";
 	
 	private ViewPager mViewPager;
 	private NewsPageAdapter mAdapter;
@@ -42,7 +44,7 @@ public class NewsMainTabActivity extends FragmentActivity {
 			case R.id.news_img://新闻图标
 				String imageLink = (String) v.getTag(R.id.new_image_link_tag);
 				if(TextUtils.isEmpty(imageLink)) {
-					Toast.makeText(getApplicationContext(), "图标没有连接 --- ", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), "图标没有连接 ", Toast.LENGTH_SHORT).show();
 				} else {
 					startBrowser(imageLink, -1);
 				}
@@ -51,7 +53,7 @@ public class NewsMainTabActivity extends FragmentActivity {
 				String ling = (String) v.getTag(R.id.new_item_link_tag);
 				mUpdateView = v;
 				if(TextUtils.isEmpty(ling)) {
-					Toast.makeText(getApplicationContext(), "item没有连接 --- ", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), "item没有连接", Toast.LENGTH_SHORT).show();
 				} else {
 					mNewsItem = (NewsItem) v.getTag(R.id.new_item_obj);
 					startBrowser(ling, mNewsItem.readStatus == 1 ? -1 : mNewsItem._id);
@@ -83,12 +85,12 @@ public class NewsMainTabActivity extends FragmentActivity {
 			
 			@Override
 			public void onPageSelected(int position) {
-				Log.v("zhang", "ViewPager onPageSelected ======== position = "+position);
+//				Log.v(fTag, "ViewPager onPageSelected ======== position = "+position);
 			}
 			
 			@Override
 			public void onPageScrolled(int arg0, float arg1, int arg2) {
-//				Log.v("zhang", "ViewPager onPageScrolled == arg0 = "+arg0+" -- arg1 = "+arg1+" -- arg2 = "+arg2);
+//				Log.v(fTag, "ViewPager onPageScrolled == arg0 = "+arg0+" -- arg1 = "+arg1+" -- arg2 = "+arg2);
 				if (arg1 == 0 || arg2 == 0) {
 					return;
 				}
@@ -102,13 +104,13 @@ public class NewsMainTabActivity extends FragmentActivity {
 						index = arg0;
 					}
 				}
-				Log.v("zhang", "ViewPager onPageScrolled == index = "+index);
+//				Log.v(fTag, "ViewPager onPageScrolled == index = "+index);
 				mAdapter.getItem(index).check2UpdateListView();
 			}
 			
 			@Override
 			public void onPageScrollStateChanged(int state) {
-				Log.v("zhang", "ViewPager onPageScrollStateChanged == state = "+state+" -- mPageIndex = "+mPageIndex);
+//				Log.v(fTag, "ViewPager onPageScrollStateChanged == state = "+state+" -- mPageIndex = "+mPageIndex);
 				switch (state) {
 					case ViewPager.SCROLL_STATE_IDLE://换页结束
 						int currentIndex = mViewPager.getCurrentItem();
@@ -143,6 +145,7 @@ public class NewsMainTabActivity extends FragmentActivity {
 			mViewPager = null;
 		}
 		mOnClickListener = null;
+		NewsDatabase.getInstance().destory();
     	super.onDestroy();
 		int myPid = android.os.Process.myPid();
 		Log.d("NewsMainTabActivity", "exit.myPid = " + myPid);

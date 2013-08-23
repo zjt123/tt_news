@@ -38,7 +38,6 @@ public class BrowserActivity extends Activity implements OnClickListener {
 	private ProgressBar mViewProgress;
 	private String mHomeURL;
 	private long _id;
-	private boolean mIsTitleBack;
 	private int mResult = -1;
 
 	private View mBackButton;
@@ -110,7 +109,7 @@ public class BrowserActivity extends Activity implements OnClickListener {
 		mWebView.setDownloadListener(new DownloadListener() {
 			@Override
 			public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-//				AndroidUtil.startActivityDownload(mContext, url);
+				//TODO download
 				Log.v(fTag, "onDownloadStart  ============= url = "+url);
 			}
 		});
@@ -190,15 +189,5 @@ public class BrowserActivity extends Activity implements OnClickListener {
 		}
 		super.finish();
 	}
-
-
-//	@Override
-//	public void onBackPressed() {
-//		if(!mIsTitleBack){
-//		}else{
-//			mIsTitleBack = false;
-//		}
-//		super.onBackPressed();
-//	}
 
 }

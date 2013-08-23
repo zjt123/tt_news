@@ -149,7 +149,6 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 
 	/**step 2*/
 	public void init(Bundle savedInstanceState) {
-//		mAdapter.setData(dataList);
 		new Thread() {
 			@Override
 			public void run() {
@@ -159,7 +158,7 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 					if (items == null) {
 						items = new ArrayList<NewsItem>();
 					}
-					Log.v("zhang", " ------init - items === " + (items == null) + " ----- mChannelId = " + mChannelId);
+					Log.v(fTag, " ------init - items === " + (items == null) + " ----- mChannelId = " + mChannelId);
 					if (items.size() == NewsItem.LIMIT_SIZE) {
 						mCanLoadMore = true;
 					}
@@ -167,7 +166,7 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 					mHandler.post(BaseFragment.this);
 				}
 				mUpdateDateTime = getUpdateDateTime();
-				if (mPosition == 0) {//TODO 1、还得加入个时间间隔判断是否刷新 2、刷新的UI状态显示
+				if (mPosition == 0) {// 1、还得时间间隔判断是否需要刷新 2、刷新的UI状态显示
 					reflush2UpdateTextTime();
 					mIsFristCount = true;
 					reflush2UpdateListView();
@@ -175,8 +174,6 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 				}
 			}
 		}.start();
-//		mListView.setOnItemClickListener(mSessionListItemClick);
-//		mListView.setOnItemLongClickListener(mSeesionListItemLongClick);
 	}
 
 	@Override
@@ -188,12 +185,9 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 	}
 	
 	public void refreshNews(ArrayList<NewsItem> items, boolean isListRefresh) {
-//		Log.v("zhang", "mChannelId = " + mChannelId + " -- items " + (items == null ? "is null" : "size = " + items.size())+" -- isRefresh = "+isRefresh);
 		boolean isTimeOver2Update = checkTimeIsOver(isListRefresh);
-		Log.v("zhang", "refreshNews --- isTimeOver2Update = " + isTimeOver2Update);
 		if (!isTimeOver2Update) {// 是否超过时间间隔，从而更新
 			if (items == null || items.size() != 0) {//这个条件的反面if (items != null && items.size() == 0) {
-//				mAdapter.cutDate();
 				mHandler.removeMessages(DATE_CHANGE_NOTIFY);
 				mHandler.sendEmptyMessageDelayed(DATE_CHANGE_NOTIFY, 500);
 			}
@@ -220,12 +214,7 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 			if(items == null) {
 				items = mAdapter.getDate();
 			}
-//			if (items == null) {
-//				items = new ArrayList<NewsItem>();
-//			}
-//			Log.v("zhang", Thread.currentThread().getName() + " -- items === "+(items==null)+" ----- mChannelId = "+mChannelId);
 			mAdapter.setDate(RssReader.pullParseXML(items, result, mChannelId));
-//			mHandler.post(BaseFragment.this);
 			setUpdateDateTime(System.currentTimeMillis());
 			mHandler.removeMessages(DATE_CHANGE_NOTIFY);
 			mHandler.sendEmptyMessage(DATE_CHANGE_NOTIFY);
@@ -236,13 +225,11 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 		synchronized (isRefresh) {
 			isRefresh = false;
 		}
-//		Log.v("zhang", "end mChannelId = "+mChannelId+" -- items " + (items == null ? "is null" : "size = " + items.size()));
 	}
 
 	private Runnable mRunnable = new Runnable() {
 		@Override
 		public void run() {
-//			Log.v("zhang", " ------refreshNews - items === null");
 			refreshNews(null, false);
 		}
 	};
@@ -250,13 +237,11 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 	private Runnable mRunnableListReFresh = new Runnable() {
 		@Override
 		public void run() {
-//			Log.v("zhang", " ------refreshNews - items === null");
 			refreshNews(null, true);
 		}
 	};
 
 	public void changePage2Refresh(boolean isListRefresh) {
-		Log.v("zhang", "changePage2Refresh isRefresh == " + isRefresh);
 		if (isRefresh) {
 			return;
 		}
@@ -272,7 +257,6 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 
 		@Override
 		public void onScrollStateChanged(AbsListView view, int scrollState) {
-			Log.v("peng", "onScrollStateChanged --- scrollState =========== "+scrollState);
 			switch (scrollState) {
 			case OnScrollListener.SCROLL_STATE_FLING:
 				mAdapter.setFlagBusy(true);
@@ -292,7 +276,7 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 		@Override
 		public void onScroll(AbsListView view, int firstVisibleItem,
 				int visibleItemCount, int totalItemCount) {
-			Log.v("peng", "onScroll -- firstVisibleItem = "+firstVisibleItem+" - visibleItemCount = "+visibleItemCount+" - totalItemCount = "+totalItemCount);
+//			Log.v(fTag, "onScroll -- firstVisibleItem = "+firstVisibleItem+" - visibleItemCount = "+visibleItemCount+" - totalItemCount = "+totalItemCount);
 		}
 	};
 	
@@ -315,13 +299,11 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 
 	@Override
 	public void onBeforeChangeHeight() {
-		Log.v("peng", "onBeforeChangeHeight ================== ");
 		updateTextTime();
 	}
 
 	@Override
 	public void onRefresh() {
-//		mAdapter.notifyDataSetChanged();
 		if (mIsFristCount) {
 			mIsFristCount = false;
 			changePage2Refresh(mIsFristCount);
@@ -336,7 +318,6 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 		String limit = size + "," + NewsItem.LIMIT_SIZE;
 		ArrayList<NewsItem> items = NewsDatabase.getInstance().selectByChannel(mChannelId, null, limit);
 		size = items == null ? 0 : items.size();
-		Log.v("peng", "onLoadMore ============ size = "+size+" -- limit == "+limit);
 		if (size >= NewsItem.LIMIT_SIZE) {
 			mCanLoadMore = true;
 		} else {
@@ -362,7 +343,6 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 	/** ui线程中检查是否要显示进度 **/
 	public void check2UpdateListView() {
 		if ((System.currentTimeMillis() - mUpdateDateTime) >= DIFF_UPDATE_TIME) {
-//			reflush2UpdateTextTime();
 			updateTextTime();
 //			mListView.setSelection(0);//TODO看需求把
 			mListView.startRefreshNot2OnRefresh();
@@ -379,7 +359,6 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 		if (!isAdded) {//avoid java.lang.IllegalStateException: Fragment BaseFragment{44b01260} not attached to Activity
 			return;
 		}
-		Log.v("peng", "isAdded() ==== "+isAdded+" -- isDetached() ==== "+isDetached());
 		if(mUpdateDateTime == 0) {//初始化更新
 			mListView.setRefreshTime(getResources().getString(R.string.listview_header_last_time));
 		} else {//其他

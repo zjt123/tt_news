@@ -78,7 +78,6 @@ public class MyEmptyViewHeader extends LinearLayout {
 		mState = STATE_REFRESHING;
 		LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
 		lp.height = LayoutParams.WRAP_CONTENT;
-//		mContainer.setLayoutParams(lp);
 		mContainer.removeView(view);
 		mContainer.addView(view, lp);
 	}

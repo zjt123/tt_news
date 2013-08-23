@@ -177,11 +177,7 @@ public class NewsDatabase extends SQLiteOpenHelper {
 		if(item != null) {
 			ContentValues cv = createContentValues(item);
 			SQLiteDatabase db = getWritableDatabase();
-//			try {
-				row = db.insert(fTableName, null, cv);
-//			} finally {
-//				db.close();
-//			}
+			row = db.insert(fTableName, null, cv);
 		}
 		return row;
 	}
@@ -192,15 +188,11 @@ public class NewsDatabase extends SQLiteOpenHelper {
 			int size = items.size();
 			rows = new long[size];
 			SQLiteDatabase db = getWritableDatabase();
-//			try {
-				ContentValues cv = null;
-				for (int i = 0; i < size; i++) {
-					cv = createContentValues(items.get(i));
-					rows[i] = db.insert(fTableName, null, cv);
-				}
-//			} finally {
-//				db.close();
-//			}
+			ContentValues cv = null;
+			for (int i = 0; i < size; i++) {
+				cv = createContentValues(items.get(i));
+				rows[i] = db.insert(fTableName, null, cv);
+			}
 		}
 		return rows;
 	}
@@ -229,11 +221,7 @@ public class NewsDatabase extends SQLiteOpenHelper {
 			}
 		}
 		SQLiteDatabase db = getWritableDatabase();
-//		try {
-			row = db.delete(fTableName, where, whereValue);
-//		} finally {
-//			db.close();
-//		}
+		row = db.delete(fTableName, where, whereValue);
 		return row;
 	}
 	
@@ -244,11 +232,7 @@ public class NewsDatabase extends SQLiteOpenHelper {
 		ContentValues cv = new ContentValues();
 		cv.put(fColumns[12], 1);
 		SQLiteDatabase db = getWritableDatabase();
-//		try {
-			row = db.update(fTableName, cv, where, whereValue);
-//		} finally {
-//			db.close();
-//		}
+		row = db.update(fTableName, cv, where, whereValue);
 		return row;
 	}
 	
@@ -307,7 +291,12 @@ public class NewsDatabase extends SQLiteOpenHelper {
 //		cv.put(fColumns[15], land);
 		return cv;
 	}
-	
+
+	public void destory() {
+		sINSTANCE.getWritableDatabase().close();
+		sINSTANCE.getReadableDatabase().close();
+	}
+
 	public int testUpdatePath() {
 		int row = -1;
 		ContentValues cv = new ContentValues();
@@ -316,5 +305,5 @@ public class NewsDatabase extends SQLiteOpenHelper {
 		row = db.update(fTableName, cv, null, null);
 		return row;
 	}
-	
+
 }

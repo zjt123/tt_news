@@ -105,10 +105,8 @@ public class NewsListAdapter extends BaseAdapter {
 		newsContextItem.setTag(R.id.new_item_title_view, newsTitle);
 		newsImg.setTag(R.id.new_image_link_tag, item.imageLink);
 		if (item.readStatus == 0) {
-//			newsTitle.setTextColor(R.color.news_title_unread_color);
 			newsTitle.setTextColor(0xff000000);
 		} else {
-//			newsTitle.setTextColor(R.color.news_title_read_color);
 			newsTitle.setTextColor(0xff9C9C9C);
 		}
 		mImageLoader.loadImage(imageDownloadUrl, newsImg, item.imagePath, item.channelId, item._id);
@@ -127,7 +125,6 @@ public class NewsListAdapter extends BaseAdapter {
 				return;
 			}
 			mItems.addAll(0, items);
-//			cutDate();
 		}
 	}
 
@@ -138,7 +135,7 @@ public class NewsListAdapter extends BaseAdapter {
 		mItems.addAll(items);
 	}
 
-	public void cutDate() {
+	private void cutDate() {
 		int size = mItems == null ? 0 : mItems.size();
 		if (size > NewsItem.LIMIT_SIZE) {
 			for (; size > NewsItem.LIMIT_SIZE; size--) {

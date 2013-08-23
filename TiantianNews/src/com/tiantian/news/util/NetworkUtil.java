@@ -49,8 +49,6 @@ public class NetworkUtil {
 		URL url = null;
 		HttpURLConnection urlConnection = null;
 		try {
-//			url = new URL("http://news.google.com/news?output=rss&amp;topic=e&amp;ned=cn");//url在xml中定义的
-//			url = new URL("http://news.google.com/news?output=rss&topic=s&ned=cn");
 			url = new URL(webUrl);
 			String host = android.net.Proxy.getDefaultHost();
 			if (!TextUtils.isEmpty(host)) {//TODO java.net.SocketTimeoutException: Transport endpoint is not connected

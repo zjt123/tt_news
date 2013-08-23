@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,9 +22,12 @@ import org.apache.http.params.HttpParams;
 import com.tiantian.news.db.NewsDatabase;
 import com.tiantian.news.R;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.http.AndroidHttpClient;
+import android.os.Build;
+import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.animation.AlphaAnimation;
@@ -35,8 +35,10 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
 public class ImageLoader {
+	public static final int HONEYCOMB_MR1 = 12;
+
+	private static final int MAX_CAPACITY = 30;// 一级缓存的最大空间
 	private static final String TAG = "ImageLoader";
-	private static final int MAX_CAPACITY = 20;// 一级缓存的最大空间
 	private static final int DEFAULT_BUFFER_SIZE = 8 * 1024; // 8 KB
 	private static final int DEFAULT_DURATION_MILLIS = 600;
 
@@ -52,25 +54,68 @@ public class ImageLoader {
 
 	/** 正在下载或者下载的集合 **/
 	private ArrayList<String> mLoading = new ArrayList<String>();
+
+	private LruCache<String, Bitmap> mMemoryCache;
+
+	public void setLruCacheSize(int memClass) {
+		if(mMemoryCache == null) {
+			// Use 1/8th of the available memory for this memory cache.
+			int size = memClass / 8;
+			Log.v(TAG, "setLruCacheSize memClass == " + memClass + " -- size = " + size);
+			if (size > 10) {
+				size = 10 + size / 10;
+			}
+			final int cacheSize = 1024 * 1024 * size;
+		    mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+		        @Override
+		        protected int sizeOf(String key, Bitmap bitmap) {
+		            // The cache size will be measured in bytes rather than number of items.
+		        	return getBitmapSize(bitmap);
+		        }
+		        
+		        @Override
+		        protected void entryRemoved(boolean evicted, String key,
+		        		Bitmap oldValue, Bitmap newValue) {
+					// 硬引用缓存区满，将一个最不经常使用的oldvalue推入到软引用缓存区
+		        	mSecondLevelCache.put(key, new SoftReference<Bitmap>(oldValue));
+		        }
+		    };
+		}
+	}
 	
 	// 0.75是加载因子为经验值，true则表示按照最近访问量的高低排序，false则表示按照插入顺序排序
-	private HashMap<String, Bitmap> mFirstLevelCache = new LinkedHashMap<String, Bitmap>(
+	private LinkedHashMap<String, SoftReference<Bitmap>> mSecondLevelCache = new LinkedHashMap<String, SoftReference<Bitmap>>(
 			MAX_CAPACITY / 2, 0.75f, true) {
 		private static final long serialVersionUID = 1L;
 
-		protected boolean removeEldestEntry(Entry<String, Bitmap> eldest) {
-			if (size() > MAX_CAPACITY) {// 当超过一级缓存阈值的时候，将老的值从一级缓存搬到二级缓存
-				mSecondLevelCache.put(eldest.getKey(),
-						new SoftReference<Bitmap>(eldest.getValue()));
+		protected boolean removeEldestEntry(Entry<String, SoftReference<Bitmap>> eldest) {
+			if (size() > MAX_CAPACITY) {
 				return true;
 			}
 			return false;
 		};
 	};
 
-	// 二级缓存，采用的是软应用，只有在内存吃紧的时候软应用才会被回收，有效的避免了oom
-	private ConcurrentHashMap<String, SoftReference<Bitmap>> mSecondLevelCache = new ConcurrentHashMap<String, SoftReference<Bitmap>>(
-			MAX_CAPACITY / 2);
+	/**
+	 * Get the size in bytes of a bitmap.
+	 */
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
+	public static int getBitmapSize(Bitmap bitmap) {
+		if (Build.VERSION.SDK_INT >= HONEYCOMB_MR1) {
+			return bitmap.getByteCount();
+		}
+		return bitmap.getRowBytes() * bitmap.getHeight();
+	}
+
+	public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+		if (getBitmapFromMemCache(key) == null) {
+			mMemoryCache.put(key, bitmap);
+		}
+	}
+
+	public Bitmap getBitmapFromMemCache(String key) {
+	    return mMemoryCache.get(key);
+	}
 
 	/**
 	 * 清理缓存
@@ -78,14 +123,7 @@ public class ImageLoader {
 	 */
 	public void destoryClearCache() {
 		ImageLoadTask.destoryClearQueue();
-		Collection<Bitmap> bitmaps = mFirstLevelCache.values();
-		mFirstLevelCache.clear();
-		if (bitmaps.size() > 0) {
-			for (Bitmap bitmap : bitmaps) {
-				bitmap.recycle();
-				bitmap = null;
-			}
-		}
+		mMemoryCache.evictAll();
 		mSecondLevelCache.clear();
 		mLoading.clear();
 	}
@@ -98,7 +136,7 @@ public class ImageLoader {
 	 */
 	public Bitmap getBitmapFromCache(String url) {
 		Bitmap bitmap = null;
-		bitmap = getFromFirstLevelCache(url);// 从一级缓存中拿
+		bitmap = getBitmapFromMemCache(url);// 从一级缓存中拿
 		if (bitmap != null) {
 			return bitmap;
 		}
@@ -125,25 +163,6 @@ public class ImageLoader {
 	}
 
 	/**
-	 * 从一级缓存中拿
-	 * 
-	 * @param url
-	 * @return
-	 */
-	private Bitmap getFromFirstLevelCache(String url) {
-//		Bitmap bitmap = null;
-//		synchronized (mFirstLevelCache) {
-//			bitmap = mFirstLevelCache.get(url);
-//			if (bitmap != null) {// 将最近访问的元素放到链的头部，提高下一次访问该元素的检索速度（LRU算法）
-//				mFirstLevelCache.remove(url);
-//				mFirstLevelCache.put(url, bitmap);
-//			}
-//		}
-//		return bitmap;
-		return mFirstLevelCache.get(url);
-	}
-
-	/**
 	 * 加载图片，如果缓存中有就直接从缓存中拿，缓存中没有就下载
 	 * @param url
 	 * @param adapter
@@ -157,35 +176,25 @@ public class ImageLoader {
 		Bitmap bitmap = getBitmapFromCache(url);// 从缓存中读取
 		if (bitmap == null) {
 			imageView.setImageResource(R.drawable.ic_launcher);//缓存没有设为默认图片
-			//TODO 判断是否正在下载,加载
+			//判断是否正在下载,加载
 			String loadingTag = channelId + "_" + url;
-			synchronized (mLoading) {
-				boolean contains = mLoading.contains(loadingTag);
-//				Log.v("zhang", contains+ " -- "+loadingTag);
-				if (contains) {
-					return;
-				}
-				mLoading.add(loadingTag);
+//			synchronized (mLoading) {
+//				boolean contains = mLoading.contains(loadingTag);
+//				if (contains) {
+//					return;
+//				}
+//				mLoading.add(loadingTag);
+//			}
+			boolean contains = mLoading.contains(loadingTag);
+//			Log.v(TAG, contains+ " -- "+loadingTag);
+			if (contains) {
+				return;
 			}
+			mLoading.add(loadingTag);
 			ImageLoadTask imageLoadTask = new ImageLoadTask();
 			imageLoadTask.execute(url, imageView, path, channelId, _id);
 		} else {
 			imageView.setImageBitmap(bitmap);//设为缓存图片
-		}
-	}
-
-	/**
-	 * 放入缓存
-	 * 
-	 * @param url
-	 * @param value
-	 */
-	public void addImage2Cache(String url, Bitmap value) {
-		if (value == null || url == null) {
-			return;
-		}
-		synchronized (mFirstLevelCache) {
-			mFirstLevelCache.put(url, value);
 		}
 	}
 
@@ -209,12 +218,15 @@ public class ImageLoader {
 				imageFile = new File(mPath);
 			}
 			boolean isExists = imageFile.exists();
-			Log.v("peng"," - imageFile = "+isExists+" -- "+imageFile.getAbsolutePath());
+//			Log.v(TAG," - imageFile = "+isExists+" -- "+imageFile.getAbsolutePath());
 			if (isExists) {//加载
 				drawable = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
 			} else {//下载
 				isDownload = true;
 				drawable = loadImageFromInternet(mUrl, imageFile, (Long) params[4]);// 获取网络图片
+			}
+			if (drawable != null) {
+				addBitmapToMemoryCache(mUrl, drawable);
 			}
 			synchronized (mLoading) {
 				mLoading.remove(mChannelId + "_" + mUrl);
@@ -234,8 +246,6 @@ public class ImageLoader {
 					fdeInAnimationBitmap(mImageView, DEFAULT_DURATION_MILLIS);
 				}
 			}
-			addImage2Cache(mUrl, result);// 放入缓存
-//			adapter.notifyDataSetChanged();// 触发getView方法执行，这个时候getView实际上会拿到刚刚缓存好的图片
 		}
 	}
 
@@ -257,7 +267,6 @@ public class ImageLoader {
 			httpGet = new HttpGet(url);
 			response = client.execute(httpGet);
 			int stateCode = response.getStatusLine().getStatusCode();
-			Log.d(TAG, "  loadImageFromInternet  [loadImage] stateCode = " + stateCode);
 			if (stateCode != HttpStatus.SC_OK) {
 				return bitmap;
 			}
@@ -285,13 +294,9 @@ public class ImageLoader {
 						os.flush();
 					}
 					int ret = NewsDatabase.getInstance().updateNewsPicPath(_id, file.getAbsolutePath());
-					Log.v("zhang", " _id = "+_id+" --ret =  "+ret + " -- willBeCreate = "+isCreate);
+//					Log.v(TAG, " _id = "+_id+" --ret =  "+ret + " -- willBeCreate = "+isCreate);
 				}
-//				return bitmap = BitmapFactory.decodeStream(is);
 			}
-		} catch (ClientProtocolException e) {
-			httpGet.abort();
-			e.printStackTrace();
 		} catch (IOException e) {
 			httpGet.abort();
 			e.printStackTrace();

@@ -34,7 +34,6 @@ public class NewsPageAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-		// return CONTENT[position % CONTENT.length].toUpperCase();
 		return fChannelNames[position];
 	}
 

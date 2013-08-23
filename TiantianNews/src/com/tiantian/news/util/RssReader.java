@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -45,10 +44,8 @@ public class RssReader {
 					} else if (item != null) {
 						if ("title".equals(nodeName)) {
 							item.spiteTitle(xmlPullParser.nextText());
-							int index = -1;
-							if ((index = source.indexOf(item)) > -1) {// TODO 去重
+							if (source.indexOf(item) > -1) {//去重
 								item = null;
-//								list.add(source.remove(index));//TODO 这个会导致getview的时候 数据越界异常。多线程
 							}
 						} else if ("link".equals(nodeName)) {
 							item.link = xmlPullParser.nextText();
