@@ -31,8 +31,8 @@ public class NetworkUtil {
 	
 	private static final int DEFAULT_BUFFER_SIZE = 512;//byte
 	private static final int DEFAULT_BUFFER_STREAM_SIZE = 8 * 1024;//byte
-	private static final int DEFAULT_CONNECT_TIME_OUT = 10000;
-	private static final int DEFAULT_READ_TIME_OUT = 10000;
+	private static final int DEFAULT_CONNECT_TIME_OUT = 20000;
+	private static final int DEFAULT_READ_TIME_OUT = 50000;
 
 	public static String getRss(String webUrl) {
 		if (TextUtils.isEmpty(webUrl)) {

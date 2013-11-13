@@ -206,15 +206,21 @@ public class BaseFragment extends Fragment implements MyListViewListener, Runnab
 		}
 		//访问网络处理数据
 		Log.v(fTag, "refreshNews getRss --start == mChannelId = "+mChannelId);
-		String result = NetworkUtil.getRss(mChannelUrl);
+		final String result = NetworkUtil.getRss(mChannelUrl);
 //		String result = NetworkUtil.getRss2(mChannelUrl);
 //		Log.v(fTag, result);
 		Log.v(fTag, "refreshNews getRss --end == mChannelId = " + mChannelId + " result is null ? " + (result == null));
 		if (!TextUtils.isEmpty(result)) {
-			if(items == null) {
+			if (items == null) {
 				items = mAdapter.getDate();
 			}
-			mAdapter.setDate(RssReader.pullParseXML(items, result, mChannelId));
+			final ArrayList<NewsItem> updateItems = items;
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mAdapter.setDate(RssReader.pullParseXML(updateItems, result, mChannelId));
+				}
+			});
 			setUpdateDateTime(System.currentTimeMillis());
 			mHandler.removeMessages(DATE_CHANGE_NOTIFY);
 			mHandler.sendEmptyMessage(DATE_CHANGE_NOTIFY);
