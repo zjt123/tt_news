@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
@@ -34,6 +35,7 @@ public class BrowserActivity extends Activity implements OnClickListener {
 	public static final String ACTION_TITLE = "com.tiantian.news.BrowserActivity.ACTION_TITLE";
 	public static final String ACTION_RESULT = "com.tiantian.news.BrowserActivity.ACTION_RESULT";
 
+	private ViewGroup mParent;
 	private WebView mWebView;
 	private ProgressBar mViewProgress;
 	private String mHomeURL;
@@ -58,6 +60,7 @@ public class BrowserActivity extends Activity implements OnClickListener {
 		mTitle = (TextView) findViewById(R.id.textview_title);
 		mViewProgress = (ProgressBar) findViewById(R.id.webview_progressbar);
 
+		mParent = (ViewGroup) findViewById(R.id.web_frame_layout);
 		mWebView = (WebView) findViewById(R.id.webview_browser);
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
@@ -171,6 +174,7 @@ public class BrowserActivity extends Activity implements OnClickListener {
 	protected void onDestroy() {
 		super.onDestroy();
 		if (mWebView != null) {
+			mParent.removeView(mWebView);
 			WebView w = mWebView;
 			w.removeAllViews();
 			w.destroy();

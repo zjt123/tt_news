@@ -100,7 +100,7 @@ public class ImageLoader {
 	 * Get the size in bytes of a bitmap.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
-	public static int getBitmapSize(Bitmap bitmap) {
+	public int getBitmapSize(Bitmap bitmap) {
 		if (Build.VERSION.SDK_INT >= HONEYCOMB_MR1) {
 			return bitmap.getByteCount();
 		}
